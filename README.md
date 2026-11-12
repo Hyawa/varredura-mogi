@@ -22,7 +22,7 @@ Baixe em **[Releases](https://github.com/Hyawa/varredura-mogi/releases/latest)**
 |---|---|---|
 | Windows (instalador) | `Varredura-Mogi-<versão>-x64-setup.exe` | instala com atalho no menu Iniciar e na área de trabalho |
 | Windows (portátil) | `Varredura-Mogi-<versão>-portable.exe` | executa direto, sem instalar |
-| Android | `app-debug.apk` | copie para o aparelho e instale (permita “instalar de fontes desconhecidas”) |
+| Android | `Varredura-Mogi-<versão>-android.apk` | copie para o aparelho e instale (permita “instalar de fontes desconhecidas”) |
 
 Os `.exe` e o APK **não são assinados**: o Windows/SmartScreen e o Android vão avisar
 “aplicativo não reconhecido”/“fonte desconhecida”. É esperado — o código é aberto e você
