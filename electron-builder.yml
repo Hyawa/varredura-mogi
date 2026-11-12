@@ -1,0 +1,48 @@
+# Empacotamento do app desktop (electron-builder).
+#
+# `npm run build` é só o web (dist/). O instalador sai daqui:
+#   npm run dist:win       → release/ com instalador NSIS + portátil
+#   npm run dist:win:dir   → só release/win-unpacked (rápido, sem instalador)
+#
+# `directories.buildResources` aponta para `recursos/` de propósito: o padrão do
+# electron-builder é `build/`, que neste projeto é a saída do esbuild
+# (build/main.mjs, build/preload.mjs) — não um diretório de ícones.
+
+appId: br.com.varreduramogi.app
+productName: Varredura Mogi
+
+directories:
+  output: release
+  buildResources: recursos
+
+# main.mjs e preload.mjs já vêm empacotados pelo esbuild (script build:node),
+# então o app não precisa de node_modules em runtime.
+files:
+  - build/**/*
+  - dist/**/*
+  - "!**/*.map"
+
+asar: true
+compression: normal
+win:
+  # PNG 1024×1024 gerado de public/logo.svg (npm run icone); o electron-builder
+  # monta o .ico do executável e do instalador a partir dele.
+  icon: recursos/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  artifactName: Varredura-Mogi-${version}-${arch}-setup.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Varredura Mogi
+  deleteAppDataOnUninstall: false
+
+portable:
+  artifactName: Varredura-Mogi-${version}-portable.${ext}

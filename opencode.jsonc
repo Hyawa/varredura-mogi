@@ -1,0 +1,75 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // Modelo líder: DeepSeek V4.1 Flash Free é o orquestrador.
+  "model": "opencode/deepseek-v4.1-flash-free",
+  "default_agent": "orchestrator-free",
+
+  "agents": {
+    "orchestrator-free": {
+      "description": "Orquestrador free: planeja e delega para workers free",
+      "mode": "primary",
+      "model": "opencode/deepseek-v4.1-flash-free",
+      "system": "You are the orchestrator. Follow the free-orchestrate skill. Use only free OpenCode models. Decompose work into bounded units, delegate to free workers, and integrate only evidence-backed results. Never switch to a paid model.",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "ask" },
+        { "action": "subagent", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "free-scout", "effect": "allow" },
+        { "action": "subagent", "resource": "free-coder", "effect": "allow" },
+        { "action": "subagent", "resource": "free-reviewer", "effect": "allow" },
+        { "action": "subagent", "resource": "free-longctx", "effect": "allow" }
+      ]
+    },
+
+    "free-scout": {
+      "description": "Mapeamento de código e pesquisa, somente leitura",
+      "mode": "subagent",
+      "model": "opencode/minimax-m3.1-flash-free",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+
+    "free-coder": {
+      "description": "Implementa mudanças",
+      "mode": "subagent",
+      "model": "opencode/mimo-v2.6-flash-free",
+      "permissions": [
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+
+    "free-reviewer": {
+      "description": "Revisa diffs e roda testes",
+      "mode": "subagent",
+      "model": "opencode/nemotron-3.5-super-vl-free",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+
+    "free-longctx": {
+      "description": "Lê arquivos grandes e contextos longos",
+      "mode": "subagent",
+      "model": "opencode/longcat-2.5-free",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    }
+  },
+
+  // Bloqueia todo provedor pago. A última regra que casa vence,
+  // por isso a exceção do provedor opencode vem depois do deny amplo.
+  "policies": [
+    { "action": "provider.use", "resource": "*", "effect": "deny" },
+    { "action": "provider.use", "resource": "opencode", "effect": "allow" }
+  ],
+
+  // Subagentes não podem abrir outros subagentes.
+  "experimental": {
+    "subagent_depth": 1
+  }
+}
